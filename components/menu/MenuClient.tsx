@@ -9,6 +9,8 @@ import { FulfillmentSwitch } from './FulfillmentSwitch'
 import { CategoryCarousel } from './CategoryCarousel'
 import { CategorySection } from './CategorySection'
 import { ProductModal } from './ProductModal'
+import { DesktopCategorySidebar } from './DesktopCategorySidebar'
+import { DesktopCartSidebar } from './DesktopCartSidebar'
 
 export type MenuCategory = {
   id: string
@@ -70,7 +72,6 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
       .filter((cat) => cat.products.length > 0)
   }, [categories, searchQuery])
 
-  // IntersectionObserver
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -90,7 +91,7 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
     const el = sectionRefs.current.get(id)
     if (!el) return
     isScrollingProgrammatically.current = true
-    const top = el.getBoundingClientRect().top + window.scrollY - 145
+    const top = el.getBoundingClientRect().top + window.scrollY - 100
     window.scrollTo({ top, behavior: 'smooth' })
     setTimeout(() => { isScrollingProgrammatically.current = false }, 600)
   }
@@ -140,11 +141,17 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
     else sectionRefs.current.delete(id)
   }, [])
 
+  const desktopCategories = filteredCategories.map((c) => ({
+    id: c.id,
+    name: c.name,
+    count: c.products.length,
+  }))
+
   return (
     <div className="min-h-screen bg-[var(--bg)]">
       {/* ═══ RESTAURANT HEADER ═══ */}
       <div className="bg-white border-b border-[var(--border)]">
-        <div className="px-4 md:container py-4">
+        <div className="px-4 lg:max-w-[1280px] lg:mx-auto lg:px-6 py-4">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h1 className="font-display text-[20px] font-extrabold text-[var(--text-primary)] leading-tight">
@@ -162,6 +169,10 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
                   Musterstrasse 12
                 </span>
               </div>
+            </div>
+            {/* Desktop: fulfillment switch in header */}
+            <div className="hidden lg:block w-[220px]">
+              <FulfillmentSwitch value={orderType} onChange={setOrderType} />
             </div>
           </div>
 
@@ -181,9 +192,9 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
         </div>
       </div>
 
-      {/* ═══ STICKY NAV ═══ */}
-      <div className="sticky top-16 z-30 bg-white border-b border-[var(--border)]">
-        <div className="px-4 md:container space-y-2 py-2.5">
+      {/* ═══ MOBILE STICKY NAV (hidden on lg) ═══ */}
+      <div className="sticky top-16 z-30 bg-white border-b border-[var(--border)] lg:hidden">
+        <div className="px-4 space-y-2 py-2.5">
           <MenuSearchBar value={searchQuery} onChange={setSearchQuery} />
           <FulfillmentSwitch value={orderType} onChange={setOrderType} />
           {filteredCategories.length > 0 && (
@@ -196,35 +207,62 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
         </div>
       </div>
 
-      {/* ═══ MENU ═══ */}
-      <div className="px-4 md:container py-4 space-y-6 pb-28">
-        {filteredCategories.map((category) => (
-          <CategorySection
-            key={category.id}
-            category={category}
-            addedProductId={addedProductId}
-            onAddSimple={addToCartSimple}
-            onOpenModal={openModal}
-            sectionRef={setSectionRef(category.id)}
-          />
-        ))}
+      {/* ═══ DESKTOP 3-COLUMN LAYOUT ═══ */}
+      <div className="lg:max-w-[1280px] lg:mx-auto lg:px-6">
+        <div className="lg:grid lg:grid-cols-[200px_1fr_300px] lg:gap-6 lg:py-5">
 
-        {searchQuery && filteredCategories.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-3xl mb-3">🔍</p>
-            <p className="text-[14px] font-bold text-[var(--text-primary)]">Keine Ergebnisse</p>
-            <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
-              Nichts für &quot;{searchQuery}&quot; gefunden.
-            </p>
-          </div>
-        )}
+          {/* LEFT: Category sidebar (desktop only) */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-20">
+              <div className="mb-4">
+                <MenuSearchBar value={searchQuery} onChange={setSearchQuery} />
+              </div>
+              <DesktopCategorySidebar
+                categories={desktopCategories}
+                activeId={activeCategory}
+                onSelect={scrollToCategory}
+              />
+            </div>
+          </aside>
 
-        {!searchQuery && categories.length === 0 && (
-          <div className="text-center py-16">
-            <ShoppingCart className="w-8 h-8 text-[var(--text-tertiary)] mx-auto mb-3" />
-            <p className="text-[14px] font-bold text-[var(--text-primary)]">Keine Gerichte verfügbar</p>
-          </div>
-        )}
+          {/* CENTER: Menu content */}
+          <main className="px-4 lg:px-0 py-4 lg:py-0 space-y-6 pb-28 lg:pb-8">
+            {filteredCategories.map((category) => (
+              <CategorySection
+                key={category.id}
+                category={category}
+                addedProductId={addedProductId}
+                onAddSimple={addToCartSimple}
+                onOpenModal={openModal}
+                sectionRef={setSectionRef(category.id)}
+              />
+            ))}
+
+            {searchQuery && filteredCategories.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-3xl mb-3">🔍</p>
+                <p className="text-[14px] font-bold text-[var(--text-primary)]">Keine Ergebnisse</p>
+                <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
+                  Nichts für &quot;{searchQuery}&quot; gefunden.
+                </p>
+              </div>
+            )}
+
+            {!searchQuery && categories.length === 0 && (
+              <div className="text-center py-16">
+                <ShoppingCart className="w-8 h-8 text-[var(--text-tertiary)] mx-auto mb-3" />
+                <p className="text-[14px] font-bold text-[var(--text-primary)]">Keine Gerichte verfügbar</p>
+              </div>
+            )}
+          </main>
+
+          {/* RIGHT: Cart sidebar (desktop only) */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-20">
+              <DesktopCartSidebar />
+            </div>
+          </aside>
+        </div>
       </div>
 
       {/* ═══ MODAL ═══ */}
