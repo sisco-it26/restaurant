@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/hooks/use-cart'
 import { formatPrice } from '@/lib/utils'
@@ -41,6 +42,10 @@ export type MenuAddon = {
 export function MenuClient({ categories }: { categories: MenuCategory[] }) {
   const { orderType, setOrderType, addItem } = useCart()
 
+  const [modalProduct, setModalProduct] = useState<MenuProduct | null>(null)
+  const [selectedVariant, setSelectedVariant] = useState<MenuVariant | null>(null)
+  const [selectedAddons, setSelectedAddons] = useState<MenuAddon[]>([])
+
   function addToCartSimple(product: MenuProduct) {
     addItem({
       productId: product.id,
@@ -55,8 +60,57 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
   }
 
   function openModal(product: MenuProduct) {
-    // stub — implemented in Task 3
-    console.log('open modal for', product.name)
+    setModalProduct(product)
+    setSelectedVariant(product.variants[0] ?? null)
+    setSelectedAddons([])
+  }
+
+  function closeModal() {
+    setModalProduct(null)
+    setSelectedVariant(null)
+    setSelectedAddons([])
+  }
+
+  function toggleAddon(addon: MenuAddon) {
+    setSelectedAddons((prev) =>
+      prev.some((a) => a.id === addon.id)
+        ? prev.filter((a) => a.id !== addon.id)
+        : [...prev, addon]
+    )
+  }
+
+  function computeModalPrice(): number {
+    if (!modalProduct) return 0
+    return (
+      modalProduct.basePrice +
+      (selectedVariant?.priceModifier ?? 0) +
+      selectedAddons.reduce((sum, a) => sum + a.price, 0)
+    )
+  }
+
+  function addToCartFromModal() {
+    if (!modalProduct) return
+    addItem({
+      productId: modalProduct.id,
+      productName: modalProduct.name,
+      productSlug: modalProduct.slug,
+      basePrice: modalProduct.basePrice,
+      quantity: 1,
+      variant: selectedVariant
+        ? {
+            id: selectedVariant.id,
+            name: selectedVariant.name,
+            priceModifier: selectedVariant.priceModifier,
+          }
+        : undefined,
+      addons: selectedAddons.map((a) => ({
+        id: a.id,
+        name: a.name,
+        price: a.price,
+      })),
+      notes: undefined,
+    })
+    closeModal()
   }
 
   return (
@@ -147,6 +201,114 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
           </section>
         ))}
       </div>
+
+      {/* Variant/Addon Modal */}
+      {modalProduct && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4"
+          onClick={(e) => { if (e.target === e.currentTarget) closeModal() }}
+        >
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6 space-y-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-display text-xl font-bold text-stone-900">
+                    {modalProduct.name}
+                  </h3>
+                  {modalProduct.description && (
+                    <p className="text-sm text-stone-600 mt-1">{modalProduct.description}</p>
+                  )}
+                </div>
+                <button
+                  onClick={closeModal}
+                  className="text-stone-400 hover:text-stone-600 text-2xl leading-none ml-4"
+                  aria-label="Schliessen"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Variants */}
+              {modalProduct.variants.length > 0 && (
+                <div className="space-y-2">
+                  <p className="font-medium text-stone-900 text-sm">Grösse wählen</p>
+                  {modalProduct.variants.map((variant) => (
+                    <label
+                      key={variant.id}
+                      className="flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors"
+                      style={{
+                        borderColor: selectedVariant?.id === variant.id ? '#5a7a52' : '#e7e5e4',
+                        backgroundColor: selectedVariant?.id === variant.id ? '#f0f4ef' : 'white',
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="variant"
+                          checked={selectedVariant?.id === variant.id}
+                          onChange={() => setSelectedVariant(variant)}
+                          className="text-moss-600"
+                        />
+                        <span className="text-sm font-medium text-stone-900">{variant.name}</span>
+                      </div>
+                      <span className="text-sm text-stone-600">
+                        {variant.priceModifier > 0
+                          ? `+${formatPrice(variant.priceModifier)}`
+                          : variant.priceModifier < 0
+                          ? `${formatPrice(variant.priceModifier)}`
+                          : 'Inklusive'}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {/* Addons */}
+              {modalProduct.addons.length > 0 && (
+                <div className="space-y-2">
+                  <p className="font-medium text-stone-900 text-sm">Extras hinzufügen</p>
+                  {modalProduct.addons.map((addon) => {
+                    const checked = selectedAddons.some((a) => a.id === addon.id)
+                    return (
+                      <label
+                        key={addon.id}
+                        className="flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors"
+                        style={{
+                          borderColor: checked ? '#5a7a52' : '#e7e5e4',
+                          backgroundColor: checked ? '#f0f4ef' : 'white',
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleAddon(addon)}
+                            className="text-moss-600"
+                          />
+                          <span className="text-sm font-medium text-stone-900">{addon.name}</span>
+                        </div>
+                        <span className="text-sm text-stone-600">+{formatPrice(addon.price)}</span>
+                      </label>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Add to Cart */}
+              <div className="border-t border-stone-200 pt-4">
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={addToCartFromModal}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Hinzufügen — {formatPrice(computeModalPrice())}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
