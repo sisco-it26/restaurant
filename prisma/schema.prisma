@@ -1,0 +1,284 @@
+// Restaurant CMS Database Schema
+// Swiss market: German locale, CHF currency, 4-digit postal codes
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// RESTAURANT SETTINGS
+// ============================================
+
+model RestaurantSettings {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  address           String
+  city              String
+  postalCode        String
+  phone             String
+  email             String
+  latitude          Float
+  longitude         Float
+  currency          String   @default("CHF")
+  locale            String   @default("de-CH")
+  autoAcceptOrders  Boolean  @default(false)
+  isOpen            Boolean  @default(true)
+  isTakingOrders    Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ============================================
+// OPENING HOURS
+// ============================================
+
+model OpeningHours {
+  id          String   @id @default(cuid())
+  dayOfWeek   Int      // 0-6 (Sunday-Saturday)
+  openTime    String   // "10:00"
+  closeTime   String   // "14:00"
+  isOpen      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([dayOfWeek])
+}
+
+model SpecialHours {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  openTime    String?
+  closeTime   String?
+  isClosed    Boolean  @default(false)
+  reason      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+}
+
+// ============================================
+// DELIVERY ZONES
+// ============================================
+
+model DeliveryZone {
+  id              String   @id @default(cuid())
+  name            String
+  postalCodes     String[]
+  deliveryFee     Decimal  @db.Decimal(10, 2)
+  minOrderAmount  Decimal? @db.Decimal(10, 2)
+  estimatedTime   Int
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ============================================
+// MENU STRUCTURE
+// ============================================
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([sortOrder])
+  @@index([isActive])
+}
+
+model Product {
+  id          String           @id @default(cuid())
+  name        String
+  slug        String           @unique
+  description String?
+  image       String?
+  basePrice   Decimal          @db.Decimal(10, 2)
+  category    Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String
+  sortOrder   Int              @default(0)
+  isActive    Boolean          @default(true)
+  isAvailable Boolean          @default(true)
+  variants    ProductVariant[]
+  addons      ProductAddon[]
+  allergens   String[]
+  additives   String[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([categoryId])
+  @@index([sortOrder])
+  @@index([isActive, isAvailable])
+}
+
+model ProductVariant {
+  id            String   @id @default(cuid())
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId     String
+  name          String
+  priceModifier Decimal  @db.Decimal(10, 2)
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model ProductAddon {
+  id        String   @id @default(cuid())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  name      String
+  price     Decimal  @db.Decimal(10, 2)
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+// ============================================
+// ORDERS
+// ============================================
+
+enum OrderType {
+  DELIVERY
+  PICKUP
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique
+  type            OrderType
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  deliveryAddress String?
+  postalCode      String?
+  deliveryZone    String?
+  deliveryFee     Decimal       @db.Decimal(10, 2) @default(0)
+  subtotal        Decimal       @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  notes           String?
+  estimatedTime   Int?
+  items           OrderItem[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  acceptedAt      DateTime?
+  completedAt     DateTime?
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([orderNumber])
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String
+  productName String
+  quantity    Int
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  totalPrice  Decimal  @db.Decimal(10, 2)
+  variant     String?
+  addons      String[]
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// ============================================
+// BLOG
+// ============================================
+
+model BlogPost {
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  excerpt        String?
+  content        String    @db.Text
+  coverImage     String?
+  author         String
+  isPublished    Boolean   @default(false)
+  publishedAt    DateTime?
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([isPublished, publishedAt])
+}
+
+// ============================================
+// STATIC PAGES
+// ============================================
+
+model Page {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  content        String   @db.Text
+  seoTitle       String?
+  seoDescription String?
+  isPublished    Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([isPublished])
+}
+
+// ============================================
+// USERS & ROLES
+// ============================================
+
+enum UserRole {
+  ADMIN
+  KITCHEN
+  STAFF
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole @default(STAFF)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([role, isActive])
+}
