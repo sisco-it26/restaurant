@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 export type CartItem = {
   id: string
@@ -24,7 +24,12 @@ export type CartItem = {
 
 export type OrderType = 'DELIVERY' | 'PICKUP'
 
+// Tracks whether the store has been rehydrated from localStorage.
+// Used by components to avoid rendering client-only values (e.g. itemCount)
+// before hydration is complete, which would cause a SSR/client mismatch.
 type CartStore = {
+  _hasHydrated: boolean
+  setHasHydrated: (value: boolean) => void
   items: CartItem[]
   orderType: OrderType
   deliveryZone?: {
@@ -52,6 +57,9 @@ type CartStore = {
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
+      _hasHydrated: false,
+      setHasHydrated: (value) => set({ _hasHydrated: value }),
+
       items: [],
       orderType: 'DELIVERY',
 
@@ -128,6 +136,10 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'restaurant-cart',
+      storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
     }
   )
 )

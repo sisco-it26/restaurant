@@ -5,8 +5,12 @@ import { useCartStore } from '@/stores/cart-store'
 export function useCart() {
   const store = useCartStore()
 
+  // Before the persist middleware has rehydrated from localStorage the server
+  // and the first client render must agree: treat the cart as empty.
+  const hydrated = store._hasHydrated
+
   return {
-    items: store.items,
+    items: hydrated ? store.items : [],
     orderType: store.orderType,
     deliveryZone: store.deliveryZone,
     postalCode: store.postalCode,
@@ -16,9 +20,9 @@ export function useCart() {
     clearCart: store.clearCart,
     setOrderType: store.setOrderType,
     setDeliveryZone: store.setDeliveryZone,
-    subtotal: store.getSubtotal(),
-    deliveryFee: store.getDeliveryFee(),
-    total: store.getTotal(),
-    itemCount: store.getItemCount(),
+    subtotal: hydrated ? store.getSubtotal() : 0,
+    deliveryFee: hydrated ? store.getDeliveryFee() : 0,
+    total: hydrated ? store.getTotal() : 0,
+    itemCount: hydrated ? store.getItemCount() : 0,
   }
 }
