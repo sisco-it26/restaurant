@@ -13,7 +13,17 @@ async function getActiveOrders() {
     },
     orderBy: { createdAt: 'asc' },
   })
-  return orders
+  return orders.map((order) => ({
+    ...order,
+    deliveryFee: Number(order.deliveryFee),
+    subtotal: Number(order.subtotal),
+    total: Number(order.total),
+    items: order.items.map((item) => ({
+      ...item,
+      unitPrice: Number(item.unitPrice),
+      totalPrice: Number(item.totalPrice),
+    })),
+  }))
 }
 
 export default async function KitchenPage() {

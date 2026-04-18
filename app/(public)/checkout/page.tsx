@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { useCart } from '@/hooks/use-cart'
 import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { FulfillmentSwitch } from '@/components/menu/FulfillmentSwitch'
 import { ArrowLeft, Loader2, CheckCircle, ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, orderType, subtotal, deliveryFee, total, clearCart, itemCount } = useCart()
+  const { items, orderType, setOrderType, subtotal, deliveryFee, total, clearCart, itemCount } = useCart()
 
   const [form, setForm] = useState({
     customerName: '',
@@ -140,6 +141,11 @@ export default function CheckoutPage() {
         <h1 className="font-display text-[22px] font-extrabold text-[var(--text-primary)] mb-6">
           Kasse
         </h1>
+
+        {/* Fulfillment Switch */}
+        <div className="mb-6">
+          <FulfillmentSwitch value={orderType} onChange={setOrderType} />
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="grid lg:grid-cols-[1fr_320px] gap-6">

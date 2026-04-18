@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { PostalCodeCheck } from '@/components/home/PostalCodeCheck'
+import { HeroOrderEntry } from '@/components/home/HeroOrderEntry'
 import { ArrowRight, Clock, Leaf, MapPin, Star, ChevronRight } from 'lucide-react'
 import { prisma } from '@/lib/db'
 import { formatPrice } from '@/lib/utils'
@@ -67,17 +67,8 @@ export default async function HomePage() {
                 Internationale Küche direkt zu dir — frisch zubereitet, schnell geliefert.
               </p>
 
-              {/* PLZ Input — prominent */}
-              <div className="max-w-[400px] pt-1">
-                <PostalCodeCheck />
-              </div>
-
-              <Link href="/menu">
-                <Button size="lg" className="mt-1">
-                  Essen finden
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </Link>
+              {/* Fulfillment switch + conditional PLZ */}
+              <HeroOrderEntry />
             </div>
 
             {/* Right: Food image */}

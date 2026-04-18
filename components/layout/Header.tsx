@@ -33,7 +33,7 @@ export function Header() {
     <>
       <header
         className={cn(
-          'sticky top-0 z-40 w-full bg-white transition-shadow duration-300',
+          'relative z-40 w-full bg-white transition-shadow duration-300',
           scrolled ? 'shadow-[var(--shadow-sm)]' : ''
         )}
       >
