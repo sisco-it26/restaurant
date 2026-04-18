@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { de } from 'date-fns/locale'
 
+export const dynamic = 'force-dynamic'
+
 async function getBlogPost(slug: string) {
   const post = await prisma.blogPost.findUnique({
     where: { slug, isPublished: true },

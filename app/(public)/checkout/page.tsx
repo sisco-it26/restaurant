@@ -18,6 +18,7 @@ export default function CheckoutPage() {
     customerPhone: '',
     deliveryAddress: '',
     postalCode: '',
+    city: '',
     notes: '',
   })
   const [submitting, setSubmitting] = useState(false)
@@ -33,7 +34,7 @@ export default function CheckoutPage() {
     form.customerName.trim() &&
     form.customerEmail.trim() &&
     form.customerPhone.trim() &&
-    (!isDelivery || (form.deliveryAddress.trim() && form.postalCode.trim())) &&
+    (!isDelivery || (form.deliveryAddress.trim() && form.postalCode.trim() && form.city.trim())) &&
     items.length > 0
 
   async function handleSubmit(e: React.FormEvent) {
@@ -199,16 +200,29 @@ export default function CheckoutPage() {
                         className="w-full h-10 px-3 text-[14px] bg-[#F5F4F0] border-0 rounded-lg outline-none focus:ring-2 focus:ring-[var(--accent)]/20 transition-all placeholder:text-[var(--text-tertiary)]"
                       />
                     </div>
-                    <div className="w-32">
-                      <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1">PLZ *</label>
-                      <input
-                        type="text"
-                        value={form.postalCode}
-                        onChange={(e) => update('postalCode', e.target.value)}
-                        required
-                        maxLength={4}
-                        className="w-full h-10 px-3 text-[14px] bg-[#F5F4F0] border-0 rounded-lg outline-none focus:ring-2 focus:ring-[var(--accent)]/20 transition-all"
-                      />
+                    <div className="grid grid-cols-[100px_1fr] gap-3">
+                      <div>
+                        <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1">PLZ *</label>
+                        <input
+                          type="text"
+                          value={form.postalCode}
+                          onChange={(e) => update('postalCode', e.target.value)}
+                          required
+                          maxLength={4}
+                          className="w-full h-10 px-3 text-[14px] bg-[#F5F4F0] border-0 rounded-lg outline-none focus:ring-2 focus:ring-[var(--accent)]/20 transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1">Ort *</label>
+                        <input
+                          type="text"
+                          value={form.city}
+                          onChange={(e) => update('city', e.target.value)}
+                          required
+                          placeholder="Zürich"
+                          className="w-full h-10 px-3 text-[14px] bg-[#F5F4F0] border-0 rounded-lg outline-none focus:ring-2 focus:ring-[var(--accent)]/20 transition-all placeholder:text-[var(--text-tertiary)]"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
