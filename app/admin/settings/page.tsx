@@ -1,22 +1,60 @@
-import { prisma } from '@/lib/db'
+'use client'
+
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-async function getSettings() {
-  const settings = await prisma.restaurantSettings.findFirst()
-  return settings
+type Settings = {
+  id: string
+  name: string
+  description: string | null
+  address: string
+  city: string
+  postalCode: string
+  phone: string
+  email: string
+  autoAcceptOrders: boolean
+  isTakingOrders: boolean
 }
 
-export default async function SettingsPage() {
-  const settings = await getSettings()
+export default function SettingsPage() {
+  const [settings, setSettings] = useState<Settings | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
-  if (!settings) {
-    return <div>Einstellungen nicht gefunden</div>
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then(setSettings)
+      .finally(() => setLoading(false))
+  }, [])
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!settings) return
+
+    setSaving(true)
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      })
+      if (res.ok) {
+        const updated = await res.json()
+        setSettings(updated)
+      }
+    } finally {
+      setSaving(false)
+    }
   }
 
+  if (loading) return <p className="text-stone-500">Wird geladen…</p>
+  if (!settings) return <p className="text-stone-500">Einstellungen nicht gefunden</p>
+
   return (
-    <div className="space-y-6 max-w-3xl">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
       <div>
         <h1 className="font-display text-3xl font-bold text-stone-900">Einstellungen</h1>
         <p className="text-stone-600 mt-2">Restaurant-Konfiguration</p>
@@ -29,23 +67,36 @@ export default async function SettingsPage() {
         <CardContent className="space-y-4">
           <div>
             <label className="text-sm font-medium text-stone-700">Name</label>
-            <Input defaultValue={settings.name} className="mt-1" />
+            <Input
+              value={settings.name}
+              onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+              className="mt-1"
+            />
           </div>
           <div>
             <label className="text-sm font-medium text-stone-700">Beschreibung</label>
             <textarea
-              defaultValue={settings.description || ''}
+              value={settings.description || ''}
+              onChange={(e) => setSettings({ ...settings, description: e.target.value })}
               className="flex min-h-[80px] w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm mt-1"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-stone-700">Telefon</label>
-              <Input defaultValue={settings.phone} className="mt-1" />
+              <Input
+                value={settings.phone}
+                onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
+                className="mt-1"
+              />
             </div>
             <div>
               <label className="text-sm font-medium text-stone-700">E-Mail</label>
-              <Input defaultValue={settings.email} className="mt-1" />
+              <Input
+                value={settings.email}
+                onChange={(e) => setSettings({ ...settings, email: e.target.value })}
+                className="mt-1"
+              />
             </div>
           </div>
         </CardContent>
@@ -58,16 +109,28 @@ export default async function SettingsPage() {
         <CardContent className="space-y-4">
           <div>
             <label className="text-sm font-medium text-stone-700">Strasse</label>
-            <Input defaultValue={settings.address} className="mt-1" />
+            <Input
+              value={settings.address}
+              onChange={(e) => setSettings({ ...settings, address: e.target.value })}
+              className="mt-1"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-stone-700">PLZ</label>
-              <Input defaultValue={settings.postalCode} className="mt-1" />
+              <Input
+                value={settings.postalCode}
+                onChange={(e) => setSettings({ ...settings, postalCode: e.target.value })}
+                className="mt-1"
+              />
             </div>
             <div>
               <label className="text-sm font-medium text-stone-700">Stadt</label>
-              <Input defaultValue={settings.city} className="mt-1" />
+              <Input
+                value={settings.city}
+                onChange={(e) => setSettings({ ...settings, city: e.target.value })}
+                className="mt-1"
+              />
             </div>
           </div>
         </CardContent>
@@ -85,7 +148,8 @@ export default async function SettingsPage() {
             </div>
             <input
               type="checkbox"
-              defaultChecked={settings.autoAcceptOrders}
+              checked={settings.autoAcceptOrders}
+              onChange={(e) => setSettings({ ...settings, autoAcceptOrders: e.target.checked })}
               className="w-4 h-4"
             />
           </div>
@@ -96,7 +160,8 @@ export default async function SettingsPage() {
             </div>
             <input
               type="checkbox"
-              defaultChecked={settings.isTakingOrders}
+              checked={settings.isTakingOrders}
+              onChange={(e) => setSettings({ ...settings, isTakingOrders: e.target.checked })}
               className="w-4 h-4"
             />
           </div>
@@ -104,8 +169,10 @@ export default async function SettingsPage() {
       </Card>
 
       <div className="flex justify-end">
-        <Button size="lg">Änderungen speichern</Button>
+        <Button type="submit" size="lg" disabled={saving}>
+          {saving ? 'Wird gespeichert…' : 'Änderungen speichern'}
+        </Button>
       </div>
-    </div>
+    </form>
   )
 }
