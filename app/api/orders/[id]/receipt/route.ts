@@ -3,10 +3,11 @@ import { generateReceipt } from '@/lib/receipt-generator'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const html = await generateReceipt(params.id)
+    const { id } = await params
+    const html = await generateReceipt(id)
 
     return new NextResponse(html, {
       headers: {

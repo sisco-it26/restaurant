@@ -3,14 +3,15 @@ import { prisma } from '@/lib/db'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { openTime, closeTime, isOpen } = body
 
     const slot = await prisma.openingHours.update({
-      where: { id: params.id },
+      where: { id },
       data: { openTime, closeTime, isOpen },
     })
     return NextResponse.json(slot)
@@ -22,10 +23,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await prisma.openingHours.delete({ where: { id: params.id } })
+    const { id } = await params
+    await prisma.openingHours.delete({ where: { id } })
     return new NextResponse(null, { status: 204 })
   } catch (error) {
     console.error('Failed to delete opening hours slot:', error)

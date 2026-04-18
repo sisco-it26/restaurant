@@ -144,7 +144,7 @@ export async function generateReceipt(orderId: string): Promise<string> {
       <span>Zwischensumme:</span>
       <span>${formatPrice(Number(order.subtotal))}</span>
     </div>
-    ${order.deliveryFee > 0 ? `
+    ${Number(order.deliveryFee) > 0 ? `
       <div class="total-row">
         <span>Liefergebühr:</span>
         <span>${formatPrice(Number(order.deliveryFee))}</span>

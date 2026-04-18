@@ -3,14 +3,15 @@ import { prisma } from '@/lib/db'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { name, slug, description, sortOrder, isActive } = body
 
     const category = await prisma.category.update({
-      where: { id: params.id },
+      where: { id },
       data: { name, slug, description, sortOrder, isActive },
       include: { _count: { select: { products: true } } },
     })

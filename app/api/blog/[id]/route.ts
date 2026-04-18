@@ -3,17 +3,18 @@ import { prisma } from '@/lib/db'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { title, slug, excerpt, content, author, isPublished } = body
 
-    const existing = await prisma.blogPost.findUnique({ where: { id: params.id } })
+    const existing = await prisma.blogPost.findUnique({ where: { id } })
     if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     const post = await prisma.blogPost.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title, slug, excerpt, content, author, isPublished,
         publishedAt: isPublished && !existing.publishedAt ? new Date() : existing.publishedAt,

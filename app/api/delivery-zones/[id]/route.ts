@@ -3,14 +3,15 @@ import { prisma } from '@/lib/db'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { name, postalCodes, deliveryFee, minOrderAmount, estimatedTime, isActive } = body
 
     const zone = await prisma.deliveryZone.update({
-      where: { id: params.id },
+      where: { id },
       data: { name, postalCodes, deliveryFee, minOrderAmount: minOrderAmount || null, estimatedTime, isActive },
     })
     return NextResponse.json(zone)
