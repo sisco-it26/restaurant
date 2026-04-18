@@ -1,7 +1,7 @@
 'use client'
 
 import { formatPrice } from '@/lib/utils'
-import { Plus, Check, Info } from 'lucide-react'
+import { Plus, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { MenuProduct } from './MenuClient'
 
@@ -17,67 +17,45 @@ export function MenuItemRow({
   onSelect: () => void
 }) {
   const hasOptions = product.variants.length > 0 || product.addons.length > 0
-  const hasAllergens = product.allergens.length > 0 || product.additives.length > 0
 
   return (
-    <div className="flex items-start gap-3 py-4 group">
-      {/* Text content */}
+    <div className="flex items-start gap-3 py-3">
+      {/* Text */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-[15px] font-bold text-[var(--text-primary)] leading-tight">
+        <h3 className="text-[14px] font-bold text-[var(--text-primary)] leading-[1.3]">
           {product.name}
         </h3>
-
-        <p className="text-[15px] font-bold text-[var(--text-primary)] mt-1">
+        <p className="text-[14px] font-semibold text-[var(--text-primary)] mt-0.5">
           {formatPrice(product.basePrice)}
           {product.variants.length > 0 && (
-            <span className="text-[12px] font-medium text-[var(--text-tertiary)] ml-1">ab</span>
+            <span className="text-[11px] font-normal text-[var(--text-tertiary)] ml-0.5">ab</span>
           )}
         </p>
-
         {product.description && (
-          <p className="text-[13px] text-[var(--text-secondary)] mt-1 line-clamp-2 leading-[1.4]">
+          <p className="text-[12px] text-[var(--text-secondary)] mt-0.5 line-clamp-2 leading-[1.4]">
             {product.description}
           </p>
         )}
-
-        {hasAllergens && (
-          <div className="flex items-center gap-1 mt-1.5">
-            <Info className="w-3 h-3 text-[var(--text-tertiary)]" />
-            <span className="text-[11px] text-[var(--text-tertiary)] leading-none">
-              {[...product.allergens, ...product.additives].join(', ')}
-            </span>
-          </div>
-        )}
       </div>
 
-      {/* Add button — large touch target */}
-      <div className="flex-shrink-0 pt-1">
-        {hasOptions ? (
-          <button
-            onClick={onSelect}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--accent)] text-white shadow-[0_2px_8px_rgba(232,93,42,0.3)] active:scale-90 transition-transform"
-            aria-label={`${product.name} auswählen`}
-          >
-            <Plus className="w-5 h-5" strokeWidth={2.5} />
-          </button>
-        ) : (
-          <button
-            onClick={onAdd}
-            className={cn(
-              'flex items-center justify-center w-10 h-10 rounded-full shadow-[0_2px_8px_rgba(232,93,42,0.3)] active:scale-90 transition-all duration-300',
-              isAdded
-                ? 'bg-[var(--success)] text-white shadow-[0_2px_8px_rgba(34,163,85,0.3)]'
-                : 'bg-[var(--accent)] text-white'
-            )}
-            aria-label={`${product.name} hinzufügen`}
-          >
-            {isAdded ? (
-              <Check className="w-5 h-5 animate-checkmark" strokeWidth={2.5} />
-            ) : (
-              <Plus className="w-5 h-5" strokeWidth={2.5} />
-            )}
-          </button>
-        )}
+      {/* Add button */}
+      <div className="flex-shrink-0 pt-0.5">
+        <button
+          onClick={hasOptions ? onSelect : onAdd}
+          className={cn(
+            'flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 active:scale-90',
+            isAdded
+              ? 'bg-[var(--accent)] text-white shadow-[0_2px_6px_rgba(61,90,62,0.3)]'
+              : 'bg-[var(--accent)] text-white shadow-[0_2px_6px_rgba(61,90,62,0.3)]'
+          )}
+          aria-label={`${product.name} hinzufügen`}
+        >
+          {isAdded ? (
+            <Check className="w-4 h-4 animate-checkmark" strokeWidth={2.5} />
+          ) : (
+            <Plus className="w-4 h-4" strokeWidth={2.5} />
+          )}
+        </button>
       </div>
     </div>
   )

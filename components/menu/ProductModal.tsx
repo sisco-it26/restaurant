@@ -189,7 +189,7 @@ export function ProductModal({
             {/* CTA */}
             <button
               onClick={onAdd}
-              className="flex-1 h-12 flex items-center justify-center gap-2 bg-[var(--accent)] text-white text-[15px] font-bold rounded-xl shadow-[0_2px_12px_rgba(232,93,42,0.25)] active:scale-[0.98] transition-transform"
+              className="flex-1 h-12 flex items-center justify-center gap-2 bg-[var(--accent)] text-white text-[15px] font-bold rounded-xl shadow-[0_2px_12px_rgba(61,90,62,0.25)] active:scale-[0.98] transition-transform"
             >
               Hinzufügen · {formatPrice(totalPrice)}
             </button>

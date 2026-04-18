@@ -10,36 +10,32 @@ export function FulfillmentSwitch({
   onChange: (v: 'DELIVERY' | 'PICKUP') => void
 }) {
   return (
-    <div className="relative flex bg-[#F0F0F0] rounded-xl p-[3px] h-11">
-      {/* Sliding indicator */}
+    <div className="relative flex bg-[#ECEAE5] rounded-lg p-[3px] h-[38px]">
+      {/* Sliding pill */}
       <div
         className={cn(
-          'absolute top-[3px] bottom-[3px] w-[calc(50%-3px)] bg-white rounded-[10px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] transition-transform duration-250 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
-          value === 'PICKUP' ? 'translate-x-[calc(100%+3px)]' : 'translate-x-0'
+          'absolute top-[3px] bottom-[3px] w-[calc(50%-3px)] rounded-[6px] transition-transform duration-250 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+          value === 'DELIVERY'
+            ? 'translate-x-0 bg-[var(--accent)]'
+            : 'translate-x-[calc(100%+3px)] bg-[var(--accent)]'
         )}
       />
       <button
         onClick={() => onChange('DELIVERY')}
         className={cn(
-          'relative z-10 flex-1 flex items-center justify-center gap-1.5 text-[13px] font-bold tracking-[-0.01em] transition-colors duration-200 rounded-[10px]',
-          value === 'DELIVERY'
-            ? 'text-[var(--text-primary)]'
-            : 'text-[var(--text-tertiary)]'
+          'relative z-10 flex-1 flex items-center justify-center gap-1.5 text-[13px] font-bold transition-colors duration-200 rounded-[6px]',
+          value === 'DELIVERY' ? 'text-white' : 'text-[var(--text-secondary)]'
         )}
       >
-        <span className="text-[15px]">🛵</span>
         Lieferung
       </button>
       <button
         onClick={() => onChange('PICKUP')}
         className={cn(
-          'relative z-10 flex-1 flex items-center justify-center gap-1.5 text-[13px] font-bold tracking-[-0.01em] transition-colors duration-200 rounded-[10px]',
-          value === 'PICKUP'
-            ? 'text-[var(--text-primary)]'
-            : 'text-[var(--text-tertiary)]'
+          'relative z-10 flex-1 flex items-center justify-center gap-1.5 text-[13px] font-bold transition-colors duration-200 rounded-[6px]',
+          value === 'PICKUP' ? 'text-white' : 'text-[var(--text-secondary)]'
         )}
       >
-        <span className="text-[15px]">🏪</span>
         Abholung
       </button>
     </div>

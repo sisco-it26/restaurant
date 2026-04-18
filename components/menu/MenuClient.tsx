@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useCart } from '@/hooks/use-cart'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, Star, Clock, Truck, MapPin } from 'lucide-react'
 
 import { MenuSearchBar } from './MenuSearchBar'
 import { FulfillmentSwitch } from './FulfillmentSwitch'
@@ -45,22 +45,18 @@ export type MenuAddon = {
 export function MenuClient({ categories }: { categories: MenuCategory[] }) {
   const { orderType, setOrderType, addItem } = useCart()
 
-  // ── State ──
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState(categories[0]?.id || '')
   const [addedProductId, setAddedProductId] = useState<string | null>(null)
 
-  // Modal state
   const [modalProduct, setModalProduct] = useState<MenuProduct | null>(null)
   const [selectedVariant, setSelectedVariant] = useState<MenuVariant | null>(null)
   const [selectedAddons, setSelectedAddons] = useState<MenuAddon[]>([])
   const [modalQty, setModalQty] = useState(1)
 
-  // Refs for scroll tracking
   const sectionRefs = useRef<Map<string, HTMLElement>>(new Map())
   const isScrollingProgrammatically = useRef(false)
 
-  // ── Filtered categories ──
   const filteredCategories = useMemo(() => {
     if (!searchQuery.trim()) return categories
     const q = searchQuery.toLowerCase()
@@ -68,59 +64,41 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
       .map((cat) => ({
         ...cat,
         products: cat.products.filter(
-          (p) =>
-            p.name.toLowerCase().includes(q) ||
-            p.description?.toLowerCase().includes(q)
+          (p) => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
         ),
       }))
       .filter((cat) => cat.products.length > 0)
   }, [categories, searchQuery])
 
-  // ── IntersectionObserver for active category ──
+  // IntersectionObserver
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (isScrollingProgrammatically.current) return
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveCategory(entry.target.id)
-          }
+          if (entry.isIntersecting) setActiveCategory(entry.target.id)
         }
       },
-      { rootMargin: '-140px 0px -65% 0px', threshold: 0 }
+      { rootMargin: '-130px 0px -65% 0px', threshold: 0 }
     )
-
     sectionRefs.current.forEach((el) => observer.observe(el))
     return () => observer.disconnect()
   }, [filteredCategories])
 
-  // ── Scroll to category ──
   function scrollToCategory(id: string) {
     setActiveCategory(id)
     const el = sectionRefs.current.get(id)
     if (!el) return
-
     isScrollingProgrammatically.current = true
-    const top = el.getBoundingClientRect().top + window.scrollY - 155
+    const top = el.getBoundingClientRect().top + window.scrollY - 145
     window.scrollTo({ top, behavior: 'smooth' })
-
-    // Re-enable observer after scroll settles
-    setTimeout(() => {
-      isScrollingProgrammatically.current = false
-    }, 600)
+    setTimeout(() => { isScrollingProgrammatically.current = false }, 600)
   }
 
-  // ── Cart actions ──
   function addToCartSimple(product: MenuProduct) {
     addItem({
-      productId: product.id,
-      productName: product.name,
-      productSlug: product.slug,
-      basePrice: product.basePrice,
-      quantity: 1,
-      variant: undefined,
-      addons: [],
-      notes: undefined,
+      productId: product.id, productName: product.name, productSlug: product.slug,
+      basePrice: product.basePrice, quantity: 1, variant: undefined, addons: [], notes: undefined,
     })
     setAddedProductId(product.id)
     setTimeout(() => setAddedProductId(null), 1500)
@@ -133,9 +111,7 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
     setModalQty(1)
   }
 
-  function closeModal() {
-    setModalProduct(null)
-  }
+  function closeModal() { setModalProduct(null) }
 
   function toggleAddon(addon: MenuAddon) {
     setSelectedAddons((prev) =>
@@ -148,11 +124,8 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
   function addToCartFromModal() {
     if (!modalProduct) return
     addItem({
-      productId: modalProduct.id,
-      productName: modalProduct.name,
-      productSlug: modalProduct.slug,
-      basePrice: modalProduct.basePrice,
-      quantity: modalQty,
+      productId: modalProduct.id, productName: modalProduct.name, productSlug: modalProduct.slug,
+      basePrice: modalProduct.basePrice, quantity: modalQty,
       variant: selectedVariant
         ? { id: selectedVariant.id, name: selectedVariant.name, priceModifier: selectedVariant.priceModifier }
         : undefined,
@@ -169,19 +142,50 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      {/* ═══════════════════════════════════════════
-          STICKY TOP HEADER
-          Search → Switch → Categories
-          ═══════════════════════════════════════════ */}
-      <div className="sticky top-16 z-30 bg-white border-b border-[var(--border)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="px-4 md:container space-y-2.5 py-3">
-          {/* Search */}
+      {/* ═══ RESTAURANT HEADER ═══ */}
+      <div className="bg-white border-b border-[var(--border)]">
+        <div className="px-4 md:container py-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="font-display text-[20px] font-extrabold text-[var(--text-primary)] leading-tight">
+                Bistro Zürich
+              </h1>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-0.5">
+                  <Star className="w-3.5 h-3.5 fill-[var(--accent)] text-[var(--accent)]" />
+                  <span className="text-[13px] font-bold text-[var(--text-primary)]">4.8</span>
+                  <span className="text-[12px] text-[var(--text-tertiary)]">(200+)</span>
+                </div>
+                <span className="text-[var(--border-strong)]">·</span>
+                <span className="text-[12px] text-[var(--text-secondary)] flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  Musterstrasse 12
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Info chips */}
+          <div className="flex gap-3 mt-3 overflow-x-auto scrollbar-hide">
+            {[
+              { icon: Clock, text: '30–45 Min' },
+              { icon: Truck, text: 'CHF 3.90 Lieferung' },
+              { text: 'Ab CHF 20 Bestellung' },
+            ].map(({ icon: Icon, text }, i) => (
+              <div key={i} className="flex items-center gap-1 text-[12px] text-[var(--text-secondary)] bg-[#F0EFEB] px-2.5 py-1 rounded-md whitespace-nowrap flex-shrink-0">
+                {Icon && <Icon className="w-3 h-3" />}
+                {text}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ STICKY NAV ═══ */}
+      <div className="sticky top-16 z-30 bg-white border-b border-[var(--border)]">
+        <div className="px-4 md:container space-y-2 py-2.5">
           <MenuSearchBar value={searchQuery} onChange={setSearchQuery} />
-
-          {/* Fulfillment switch */}
           <FulfillmentSwitch value={orderType} onChange={setOrderType} />
-
-          {/* Category carousel */}
           {filteredCategories.length > 0 && (
             <CategoryCarousel
               categories={filteredCategories.map((c) => ({ id: c.id, name: c.name }))}
@@ -192,10 +196,8 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════
-          MENU CONTENT
-          ═══════════════════════════════════════════ */}
-      <div className="px-4 md:container py-5 space-y-8 pb-28">
+      {/* ═══ MENU ═══ */}
+      <div className="px-4 md:container py-4 space-y-6 pb-28">
         {filteredCategories.map((category) => (
           <CategorySection
             key={category.id}
@@ -207,36 +209,25 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
           />
         ))}
 
-        {/* Empty search state */}
         {searchQuery && filteredCategories.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-[var(--text-tertiary)] text-4xl mb-4">🔍</p>
-            <h3 className="font-display text-lg font-bold text-[var(--text-primary)] mb-1">
-              Keine Ergebnisse
-            </h3>
-            <p className="text-[13px] text-[var(--text-secondary)]">
-              Keine Gerichte für &quot;{searchQuery}&quot; gefunden.
+          <div className="text-center py-12">
+            <p className="text-3xl mb-3">🔍</p>
+            <p className="text-[14px] font-bold text-[var(--text-primary)]">Keine Ergebnisse</p>
+            <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
+              Nichts für &quot;{searchQuery}&quot; gefunden.
             </p>
           </div>
         )}
 
-        {/* Empty menu state */}
         {!searchQuery && categories.length === 0 && (
-          <div className="text-center py-20">
-            <ShoppingCart className="w-10 h-10 text-[var(--text-tertiary)] mx-auto mb-4" />
-            <h3 className="font-display text-lg font-bold text-[var(--text-primary)] mb-1">
-              Keine Gerichte verfügbar
-            </h3>
-            <p className="text-[13px] text-[var(--text-secondary)]">
-              Bitte versuchen Sie es später erneut.
-            </p>
+          <div className="text-center py-16">
+            <ShoppingCart className="w-8 h-8 text-[var(--text-tertiary)] mx-auto mb-3" />
+            <p className="text-[14px] font-bold text-[var(--text-primary)]">Keine Gerichte verfügbar</p>
           </div>
         )}
       </div>
 
-      {/* ═══════════════════════════════════════════
-          PRODUCT MODAL / BOTTOM SHEET
-          ═══════════════════════════════════════════ */}
+      {/* ═══ MODAL ═══ */}
       {modalProduct && (
         <ProductModal
           product={modalProduct}

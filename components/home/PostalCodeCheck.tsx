@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, CheckCircle, XCircle } from 'lucide-react'
+import { Loader2, CheckCircle, XCircle, MapPin } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 type ValidationResult = {
   available: boolean
@@ -14,7 +15,7 @@ type ValidationResult = {
   message?: string
 }
 
-export function PostalCodeCheck() {
+export function PostalCodeCheck({ variant = 'default' }: { variant?: 'default' | 'hero' }) {
   const [postalCode, setPostalCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<ValidationResult | null>(null)
@@ -38,40 +39,61 @@ export function PostalCodeCheck() {
     }
   }
 
+  const isHero = variant === 'hero'
+
   return (
     <div className="space-y-2">
       <div className="flex">
-        <input
-          type="text"
-          placeholder="PLZ eingeben"
-          value={postalCode}
-          onChange={(e) => setPostalCode(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleCheck()}
-          maxLength={4}
-          className="flex-1 h-12 px-4 text-sm font-medium border-2 border-r-0 border-[var(--border-strong)] rounded-l-xl bg-white focus:outline-none focus:border-[var(--accent)] transition-colors placeholder:text-[var(--text-tertiary)]"
-        />
+        <div className="relative flex-1">
+          <MapPin className={cn(
+            'absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none',
+            isHero ? 'text-[var(--text-tertiary)]' : 'text-[var(--text-tertiary)]'
+          )} />
+          <input
+            type="text"
+            placeholder="Deine Postleitzahl"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleCheck()}
+            maxLength={4}
+            className={cn(
+              'w-full pl-10 pr-3 text-[14px] font-medium rounded-l-xl focus:outline-none transition-colors placeholder:text-[var(--text-tertiary)]',
+              isHero
+                ? 'h-[52px] bg-white text-[var(--text-primary)] border-0'
+                : 'h-11 bg-white border-2 border-r-0 border-[var(--border-strong)] focus:border-[var(--accent)]'
+            )}
+          />
+        </div>
         <button
           onClick={handleCheck}
           disabled={loading || !postalCode.trim()}
-          className="h-12 px-6 text-sm font-semibold bg-[var(--accent)] text-white rounded-r-xl hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors"
+          className={cn(
+            'font-semibold text-white rounded-r-xl transition-colors disabled:opacity-50 flex-shrink-0',
+            isHero
+              ? 'h-[52px] px-6 text-[14px] bg-[var(--accent)] hover:bg-[var(--accent-hover)]'
+              : 'h-11 px-5 text-[13px] bg-[var(--accent)] hover:bg-[var(--accent-hover)]'
+          )}
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Prüfen'}
         </button>
       </div>
 
       {result && (
-        <div className="flex items-center gap-2 text-sm animate-fade-in">
+        <div className={cn(
+          'flex items-center gap-2 text-[13px] animate-fade-in',
+          isHero ? 'text-white/90' : ''
+        )}>
           {result.available ? (
             <>
-              <CheckCircle className="w-4 h-4 text-[var(--success)] flex-shrink-0" />
-              <span className="text-[var(--success)] font-medium">
-                Lieferung möglich — ca. {result.zone?.estimatedTime} Min. • CHF {result.zone?.deliveryFee.toFixed(2)} Liefergebühr
+              <CheckCircle className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
+              <span className="font-medium">
+                Lieferung möglich — ca. {result.zone?.estimatedTime} Min. · CHF {result.zone?.deliveryFee.toFixed(2)}
               </span>
             </>
           ) : (
             <>
-              <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-              <span className="text-red-600 font-medium">{result.message || 'Leider nicht verfügbar'}</span>
+              <XCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+              <span className="font-medium">{result.message || 'Leider nicht verfügbar'}</span>
             </>
           )}
         </div>

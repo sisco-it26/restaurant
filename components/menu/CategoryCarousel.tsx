@@ -14,21 +14,20 @@ export function CategoryCarousel({
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Keep active pill centered in view
   useEffect(() => {
     if (!scrollRef.current) return
-    const activeBtn = scrollRef.current.querySelector(`[data-cat="${activeId}"]`) as HTMLElement | null
-    if (activeBtn) {
+    const el = scrollRef.current.querySelector(`[data-cat="${activeId}"]`) as HTMLElement | null
+    if (el) {
       const container = scrollRef.current
-      const scrollLeft = activeBtn.offsetLeft - container.offsetWidth / 2 + activeBtn.offsetWidth / 2
-      container.scrollTo({ left: scrollLeft, behavior: 'smooth' })
+      const left = el.offsetLeft - container.offsetWidth / 2 + el.offsetWidth / 2
+      container.scrollTo({ left, behavior: 'smooth' })
     }
   }, [activeId])
 
   return (
     <div
       ref={scrollRef}
-      className="flex gap-2 overflow-x-auto scrollbar-hide py-1 -mx-4 px-4"
+      className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-4 px-4 py-0.5"
       role="tablist"
     >
       {categories.map((cat) => {
@@ -41,10 +40,10 @@ export function CategoryCarousel({
             aria-selected={isActive}
             onClick={() => onSelect(cat.id)}
             className={cn(
-              'flex-shrink-0 px-4 py-[7px] rounded-full text-[13px] font-bold whitespace-nowrap transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/30',
+              'flex-shrink-0 px-3.5 py-[6px] rounded-full text-[13px] font-semibold whitespace-nowrap transition-all duration-150',
               isActive
                 ? 'bg-[var(--text-primary)] text-white'
-                : 'bg-[#F0F0F0] text-[var(--text-secondary)] active:bg-[#E5E5E5]'
+                : 'bg-transparent text-[var(--text-secondary)] active:bg-[#E8E6E1]'
             )}
           >
             {cat.name}

@@ -6,20 +6,20 @@
 
 @layer base {
   :root {
-    /* Semantic colors */
-    --bg: #FEFCF9;
+    /* Semantic colors — Moss/Olive palette */
+    --bg: #F8F7F4;
     --bg-elevated: #FFFFFF;
-    --text-primary: #1A1A1A;
-    --text-secondary: #6B6B6B;
-    --text-tertiary: #9A9A9A;
-    --accent: #E85D2A;
-    --accent-hover: #D14D1E;
-    --accent-light: #FFF3EE;
-    --accent-subtle: #FFE8DB;
-    --success: #22A355;
-    --success-light: #EEFBF3;
-    --border: #ECECEC;
-    --border-strong: #D4D4D4;
+    --text-primary: #1C1C1C;
+    --text-secondary: #626262;
+    --text-tertiary: #969696;
+    --accent: #3D5A3E;
+    --accent-hover: #2E4830;
+    --accent-light: #EEF3EE;
+    --accent-subtle: #E2EBE2;
+    --success: #3D5A3E;
+    --success-light: #EEF3EE;
+    --border: #E8E6E1;
+    --border-strong: #D0CEC9;
 
     /* Shadows */
     --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
@@ -29,25 +29,25 @@
     --shadow-xl: 0 20px 60px rgba(0,0,0,0.15);
 
     /* shadcn compat */
-    --background: 39 60% 99%;
-    --foreground: 0 0% 10%;
+    --background: 43 18% 96%;
+    --foreground: 0 0% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 0 0% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 16 78% 54%;
+    --popover-foreground: 0 0% 11%;
+    --primary: 122 19% 30%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 10%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 42%;
-    --accent: 16 78% 54%;
+    --secondary: 40 8% 95%;
+    --secondary-foreground: 0 0% 11%;
+    --muted: 40 8% 95%;
+    --muted-foreground: 0 0% 38%;
+    --accent: 122 19% 30%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 92%;
-    --input: 0 0% 92%;
-    --ring: 16 78% 54%;
+    --border: 40 8% 90%;
+    --input: 40 8% 90%;
+    --ring: 122 19% 30%;
     --radius: 0.75rem;
   }
 }
