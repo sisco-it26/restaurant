@@ -139,10 +139,12 @@ export default function CartPage() {
               <span className="font-display text-lg font-extrabold text-[var(--text-primary)]">{formatPrice(total)}</span>
             </div>
 
-            <Button className="w-full h-14 text-base" size="lg">
-              Zur Kasse
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
+            <Link href="/checkout">
+              <Button className="w-full h-14 text-base" size="lg">
+                Zur Kasse
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+            </Link>
             <p className="text-xs text-center text-[var(--text-tertiary)]">
               {orderType === 'DELIVERY' ? '🛵 Lieferung' : '🏪 Abholung'}
             </p>
