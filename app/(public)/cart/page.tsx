@@ -115,7 +115,7 @@ export default function CartPage() {
             {orderType === 'DELIVERY'
               ? deliveryFee > 0
                 ? formatPrice(deliveryFee)
-                : '—'
+                : 'Kostenlos'
               : 'Kostenlos'}
           </span>
         </div>

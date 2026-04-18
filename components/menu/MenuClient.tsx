@@ -175,7 +175,7 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
                       <span className="font-display text-xl font-semibold text-moss-600">
                         {formatPrice(product.basePrice)}
                       </span>
-                      {product.variants.length === 0 ? (
+                      {product.variants.length === 0 && product.addons.length === 0 ? (
                         <Button size="sm" onClick={() => addToCartSimple(product)}>
                           <Plus className="w-4 h-4 mr-1" />
                           Hinzufügen
