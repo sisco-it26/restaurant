@@ -11,7 +11,7 @@ export default function PublicLayout({
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-[hsl(40,33%,97%)]">
+      <main className="min-h-screen bg-[var(--bg)]">
         {children}
       </main>
       <Footer />

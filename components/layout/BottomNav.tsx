@@ -18,8 +18,8 @@ export function BottomNav() {
   const { itemCount } = useCart()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-[hsl(35,15%,87%)] md:hidden">
-      <div className="flex items-center justify-around h-16">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[var(--border)] shadow-[0_-2px_10px_rgba(0,0,0,0.06)] md:hidden pb-safe">
+      <div className="flex items-center justify-around h-[4.25rem]">
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
@@ -30,16 +30,21 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors relative',
-                isActive ? 'text-[hsl(24,70%,45%)]' : 'text-[hsl(30,8%,46%)]'
+                'flex flex-col items-center justify-center flex-1 h-full gap-1 relative transition-colors',
+                isActive ? 'text-[var(--accent)]' : 'text-[var(--text-tertiary)]'
               )}
             >
-              <Icon className="w-5 h-5" />
-              <span className="text-[10px] font-medium tracking-wide">{item.label}</span>
-              {isCart && itemCount > 0 && (
-                <span className="absolute top-2 right-1/4 bg-[hsl(24,70%,45%)] text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {itemCount}
-                </span>
+              <div className="relative">
+                <Icon className="w-[22px] h-[22px]" strokeWidth={isActive ? 2.5 : 1.8} />
+                {isCart && itemCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 bg-[var(--accent)] text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                    {itemCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] font-semibold tracking-wide">{item.label}</span>
+              {isActive && (
+                <div className="absolute bottom-1 w-1 h-1 rounded-full bg-[var(--accent)]" />
               )}
             </Link>
           )
