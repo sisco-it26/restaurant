@@ -262,6 +262,23 @@ model Page {
 }
 
 // ============================================
+// CONTACT MESSAGES
+// ============================================
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isRead, createdAt])
+}
+
+// ============================================
 // USERS & ROLES
 // ============================================
 
