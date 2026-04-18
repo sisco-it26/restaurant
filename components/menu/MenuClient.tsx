@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/hooks/use-cart'
 
@@ -56,6 +55,7 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
           variant={orderType === 'DELIVERY' ? 'default' : 'outline'}
           className="flex-1"
           onClick={() => setOrderType('DELIVERY')}
+          aria-pressed={orderType === 'DELIVERY'}
         >
           Lieferung
         </Button>
@@ -63,6 +63,7 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
           variant={orderType === 'PICKUP' ? 'default' : 'outline'}
           className="flex-1"
           onClick={() => setOrderType('PICKUP')}
+          aria-pressed={orderType === 'PICKUP'}
         >
           Abholung
         </Button>
