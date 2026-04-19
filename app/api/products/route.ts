@@ -6,8 +6,8 @@ export async function GET() {
     const products = await prisma.product.findMany({
       include: {
         category: true,
-        variants: { where: { isActive: true }, orderBy: { sortOrder: 'asc' } },
-        addons: { where: { isActive: true }, orderBy: { sortOrder: 'asc' } },
+        variants: { orderBy: { sortOrder: 'asc' } },
+        addons: { orderBy: { sortOrder: 'asc' } },
       },
       orderBy: { sortOrder: 'asc' },
     })
@@ -21,10 +21,15 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, slug, description, basePrice, categoryId, sortOrder, isActive, isAvailable, allergens, additives } = body
+    const { name, slug, description, basePrice, categoryId, sortOrder, isActive, isAvailable, allergens, additives, variants, addons } = body
 
     const product = await prisma.product.create({
-      data: { name, slug, description, basePrice, categoryId, sortOrder, isActive, isAvailable, allergens: allergens || [], additives: additives || [] },
+      data: {
+        name, slug, description, basePrice, categoryId, sortOrder, isActive, isAvailable,
+        allergens: allergens || [], additives: additives || [],
+        variants: variants?.length ? { createMany: { data: variants.map((v: any, i: number) => ({ name: v.name, priceModifier: v.priceModifier || 0, sortOrder: i, isActive: true })) } } : undefined,
+        addons: addons?.length ? { createMany: { data: addons.map((a: any, i: number) => ({ name: a.name, price: a.price || 0, sortOrder: i, isActive: true })) } } : undefined,
+      },
       include: { category: true, variants: true, addons: true },
     })
     return NextResponse.json(product, { status: 201 })

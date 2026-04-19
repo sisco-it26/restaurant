@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, X, ChevronDown, ChevronRight } from 'lucide-react'
+import { Plus, X, ChevronDown, ChevronRight, Trash2 } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 
 type Category = { id: string; name: string }
-type Variant = { id: string; name: string; priceModifier: number }
-type Addon = { id: string; name: string; price: number }
+type Variant = { id: string; name: string; priceModifier: number; isActive?: boolean }
+type Addon = { id: string; name: string; price: number; isActive?: boolean }
 type Product = {
   id: string
   name: string
@@ -27,6 +27,9 @@ type Product = {
   addons: Addon[]
 }
 
+type FormVariant = { name: string; priceModifier: string }
+type FormAddon = { name: string; price: string }
+
 type FormData = {
   name: string
   slug: string
@@ -38,6 +41,8 @@ type FormData = {
   isAvailable: boolean
   allergensText: string
   additivesText: string
+  variants: FormVariant[]
+  addons: FormAddon[]
 }
 
 export default function MenuManagementPage() {
@@ -51,6 +56,7 @@ export default function MenuManagementPage() {
   const [formData, setFormData] = useState<FormData>({
     name: '', slug: '', description: '', basePrice: '', categoryId: '',
     sortOrder: 0, isActive: true, isAvailable: true, allergensText: '', additivesText: '',
+    variants: [], addons: [],
   })
 
   useEffect(() => {
@@ -81,6 +87,8 @@ export default function MenuManagementPage() {
         isActive: product.isActive, isAvailable: product.isAvailable,
         allergensText: product.allergens.join(', '),
         additivesText: product.additives.join(', '),
+        variants: product.variants.map((v) => ({ name: v.name, priceModifier: String(v.priceModifier) })),
+        addons: product.addons.map((a) => ({ name: a.name, price: String(a.price) })),
       })
     } else {
       setEditingId(null)
@@ -89,6 +97,7 @@ export default function MenuManagementPage() {
         basePrice: '', categoryId: categories[0]?.id || '',
         sortOrder: products.length, isActive: true, isAvailable: true,
         allergensText: '', additivesText: '',
+        variants: [], addons: [],
       })
     }
     setModalOpen(true)
@@ -108,6 +117,14 @@ export default function MenuManagementPage() {
       isActive: formData.isActive, isAvailable: formData.isAvailable,
       allergens: formData.allergensText.split(',').map((s) => s.trim()).filter(Boolean),
       additives: formData.additivesText.split(',').map((s) => s.trim()).filter(Boolean),
+      variants: formData.variants.filter((v) => v.name.trim()).map((v) => ({
+        name: v.name.trim(),
+        priceModifier: parseFloat(v.priceModifier) || 0,
+      })),
+      addons: formData.addons.filter((a) => a.name.trim()).map((a) => ({
+        name: a.name.trim(),
+        price: parseFloat(a.price) || 0,
+      })),
     }
     try {
       const url = editingId ? `/api/products/${editingId}` : '/api/products'
@@ -125,6 +142,34 @@ export default function MenuManagementPage() {
       if (next.has(id)) next.delete(id); else next.add(id)
       return next
     })
+  }
+
+  // Variant helpers
+  function addVariant() {
+    setFormData((prev) => ({ ...prev, variants: [...prev.variants, { name: '', priceModifier: '0' }] }))
+  }
+  function removeVariant(index: number) {
+    setFormData((prev) => ({ ...prev, variants: prev.variants.filter((_, i) => i !== index) }))
+  }
+  function updateVariant(index: number, field: keyof FormVariant, value: string) {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.map((v, i) => i === index ? { ...v, [field]: value } : v),
+    }))
+  }
+
+  // Addon helpers
+  function addAddon() {
+    setFormData((prev) => ({ ...prev, addons: [...prev.addons, { name: '', price: '0' }] }))
+  }
+  function removeAddon(index: number) {
+    setFormData((prev) => ({ ...prev, addons: prev.addons.filter((_, i) => i !== index) }))
+  }
+  function updateAddon(index: number, field: keyof FormAddon, value: string) {
+    setFormData((prev) => ({
+      ...prev,
+      addons: prev.addons.map((a, i) => i === index ? { ...a, [field]: value } : a),
+    }))
   }
 
   if (loading) return <p className="text-stone-500">Wird geladen…</p>
@@ -175,7 +220,7 @@ export default function MenuManagementPage() {
                         {product.description && (
                           <p className="text-sm text-stone-500 line-clamp-1">{product.description}</p>
                         )}
-                        {product.variants.length > 0 && (
+                        {(product.variants.length > 0 || product.addons.length > 0) && (
                           <p className="text-xs text-stone-400 mt-0.5">
                             {product.variants.length} Variante(n) • {product.addons.length} Extra(s)
                           </p>
@@ -274,6 +319,90 @@ export default function MenuManagementPage() {
               <div>
                 <label className="text-sm font-medium text-stone-700">Zusatzstoffe (kommagetrennt)</label>
                 <Input value={formData.additivesText} onChange={(e) => setFormData({ ...formData, additivesText: e.target.value })} placeholder="Koffein" className="mt-1" />
+              </div>
+
+              {/* ═══ VARIANTEN ═══ */}
+              <div className="border-t border-stone-200 pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-bold text-stone-900">Varianten (Grössen)</label>
+                  <button
+                    type="button"
+                    onClick={addVariant}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-green-700 hover:text-green-800"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Hinzufügen
+                  </button>
+                </div>
+                {formData.variants.length === 0 && (
+                  <p className="text-xs text-stone-400">Keine Varianten — Klick auf "Hinzufügen"</p>
+                )}
+                <div className="space-y-2">
+                  {formData.variants.map((v, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <Input
+                        value={v.name}
+                        onChange={(e) => updateVariant(i, 'name', e.target.value)}
+                        placeholder="z.B. Klein, Mittel, Gross"
+                        className="flex-1 h-9 text-sm"
+                      />
+                      <div className="w-28 flex-shrink-0">
+                        <Input
+                          type="number"
+                          step="0.50"
+                          value={v.priceModifier}
+                          onChange={(e) => updateVariant(i, 'priceModifier', e.target.value)}
+                          placeholder="+/- CHF"
+                          className="h-9 text-sm"
+                        />
+                      </div>
+                      <button type="button" onClick={() => removeVariant(i)} className="p-1.5 text-stone-400 hover:text-red-500">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ═══ EXTRAS ═══ */}
+              <div className="border-t border-stone-200 pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-bold text-stone-900">Extras (Zusätze)</label>
+                  <button
+                    type="button"
+                    onClick={addAddon}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-green-700 hover:text-green-800"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Hinzufügen
+                  </button>
+                </div>
+                {formData.addons.length === 0 && (
+                  <p className="text-xs text-stone-400">Keine Extras — Klick auf "Hinzufügen"</p>
+                )}
+                <div className="space-y-2">
+                  {formData.addons.map((a, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <Input
+                        value={a.name}
+                        onChange={(e) => updateAddon(i, 'name', e.target.value)}
+                        placeholder="z.B. Extra Käse, Jalapeños"
+                        className="flex-1 h-9 text-sm"
+                      />
+                      <div className="w-28 flex-shrink-0">
+                        <Input
+                          type="number"
+                          step="0.50"
+                          value={a.price}
+                          onChange={(e) => updateAddon(i, 'price', e.target.value)}
+                          placeholder="CHF"
+                          className="h-9 text-sm"
+                        />
+                      </div>
+                      <button type="button" onClick={() => removeAddon(i)} className="p-1.5 text-stone-400 hover:text-red-500">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="flex gap-4">
