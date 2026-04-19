@@ -4,10 +4,11 @@ import { useState } from 'react'
 import { useCart } from '@/hooks/use-cart'
 import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { FulfillmentSwitch } from '@/components/menu/FulfillmentSwitch'
-import { ArrowLeft, Loader2, CheckCircle, ShoppingCart } from 'lucide-react'
+import { DeliveryModePill } from '@/components/menu/DeliveryModePill'
+import { ArrowLeft, Loader2, CheckCircle, ShoppingCart, Truck, Store } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -142,9 +143,43 @@ export default function CheckoutPage() {
           Kasse
         </h1>
 
-        {/* Fulfillment Switch */}
+        {/* Delivery Mode Selection */}
         <div className="mb-6">
-          <FulfillmentSwitch value={orderType} onChange={setOrderType} />
+          <h2 className="text-[13px] font-bold text-[var(--text-secondary)] mb-3">Bestellart</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setOrderType('DELIVERY')}
+              className={cn(
+                'flex items-center gap-3 p-4 rounded-xl border-2 transition-all',
+                orderType === 'DELIVERY'
+                  ? 'border-[var(--accent)] bg-[var(--accent-light)]'
+                  : 'border-[var(--border)] hover:border-[var(--border-strong)]'
+              )}
+            >
+              <Truck className="w-5 h-5 text-[var(--accent)]" />
+              <div className="flex-1 text-left">
+                <p className="text-[14px] font-bold text-[var(--text-primary)]">Lieferung</p>
+                <p className="text-[12px] text-[var(--text-secondary)]">30–40 Min</p>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setOrderType('PICKUP')}
+              className={cn(
+                'flex items-center gap-3 p-4 rounded-xl border-2 transition-all',
+                orderType === 'PICKUP'
+                  ? 'border-[var(--accent)] bg-[var(--accent-light)]'
+                  : 'border-[var(--border)] hover:border-[var(--border-strong)]'
+              )}
+            >
+              <Store className="w-5 h-5 text-[var(--accent)]" />
+              <div className="flex-1 text-left">
+                <p className="text-[14px] font-bold text-[var(--text-primary)]">Abholung</p>
+                <p className="text-[12px] text-[var(--text-secondary)]">15–20 Min</p>
+              </div>
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>

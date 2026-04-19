@@ -7,19 +7,19 @@
 @layer base {
   :root {
     /* Semantic colors — Moss/Olive palette */
-    --bg: #F8F7F4;
+    --bg: #F7F6F3;
     --bg-elevated: #FFFFFF;
-    --text-primary: #1C1C1C;
-    --text-secondary: #626262;
-    --text-tertiary: #969696;
-    --accent: #3D5A3E;
-    --accent-hover: #2E4830;
-    --accent-light: #EEF3EE;
-    --accent-subtle: #E2EBE2;
-    --success: #3D5A3E;
-    --success-light: #EEF3EE;
-    --border: #E8E6E1;
-    --border-strong: #D0CEC9;
+    --text-primary: #1A1A1A;
+    --text-secondary: #4A4A4A;
+    --text-tertiary: #7A7A7A;
+    --accent: #2D4A2E;
+    --accent-hover: #1E3620;
+    --accent-light: #C5DBC6;
+    --accent-subtle: #E3EDE3;
+    --success: #2D4A2E;
+    --success-light: #C5DBC6;
+    --border: #E2E0DB;
+    --border-strong: #C5C3BE;
 
     /* Shadows */
     --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
@@ -35,19 +35,18 @@
     --card-foreground: 0 0% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 11%;
-    --primary: 122 19% 30%;
+    --primary: 123 25% 24%;
     --primary-foreground: 0 0% 100%;
     --secondary: 40 8% 95%;
     --secondary-foreground: 0 0% 11%;
     --muted: 40 8% 95%;
     --muted-foreground: 0 0% 38%;
-    --accent: 122 19% 30%;
+    --shadcn-accent: 123 25% 24%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 40 8% 90%;
     --input: 40 8% 90%;
-    --ring: 122 19% 30%;
+    --ring: 123 25% 24%;
     --radius: 0.75rem;
   }
 }

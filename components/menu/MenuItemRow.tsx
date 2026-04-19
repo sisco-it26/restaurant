@@ -50,7 +50,7 @@ export function MenuItemRow({
           }}
           className={cn(
             'flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 active:scale-[0.85]',
-            'bg-[var(--accent)] text-white shadow-[0_3px_12px_rgba(61,90,62,0.4)] hover:shadow-[0_4px_16px_rgba(61,90,62,0.5)]',
+            'bg-[var(--accent)] text-white shadow-[0_3px_12px_rgba(45,74,46,0.45)] hover:shadow-[0_4px_16px_rgba(45,74,46,0.55)]',
             'border-2 border-white'
           )}
           aria-label={`${product.name} hinzufügen`}

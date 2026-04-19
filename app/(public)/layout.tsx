@@ -1,7 +1,7 @@
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
-import { BottomNav } from '@/components/layout/BottomNav'
 import { ClosedOverlay } from '@/components/layout/ClosedOverlay'
+import { FloatingCartBar } from '@/components/menu/FloatingCartBar'
 
 export default function PublicLayout({
   children,
@@ -15,7 +15,7 @@ export default function PublicLayout({
         {children}
       </main>
       <Footer />
-      <BottomNav />
+      <FloatingCartBar />
       <ClosedOverlay />
     </>
   )

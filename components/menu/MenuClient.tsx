@@ -5,13 +5,12 @@ import { useCart } from '@/hooks/use-cart'
 import { ShoppingCart, Star, Clock, Truck, MapPin } from 'lucide-react'
 
 import { MenuSearchBar } from './MenuSearchBar'
-import { FulfillmentSwitch } from './FulfillmentSwitch'
+import { DeliveryModePill } from './DeliveryModePill'
 import { CategoryCarousel } from './CategoryCarousel'
 import { CategorySection } from './CategorySection'
 import { ProductModal } from './ProductModal'
 import { DesktopCategorySidebar } from './DesktopCategorySidebar'
 import { DesktopCartSidebar } from './DesktopCartSidebar'
-import { FloatingCartBar } from './FloatingCartBar'
 
 export type MenuCategory = {
   id: string
@@ -171,9 +170,9 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
                 </span>
               </div>
             </div>
-            {/* Desktop: fulfillment switch in header */}
-            <div className="hidden lg:block w-[220px]">
-              <FulfillmentSwitch value={orderType} onChange={setOrderType} />
+            {/* Desktop: delivery mode pill */}
+            <div className="hidden lg:block">
+              <DeliveryModePill />
             </div>
           </div>
 
@@ -196,8 +195,12 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
       {/* ═══ MOBILE STICKY NAV (hidden on lg) ═══ */}
       <div className="sticky top-0 z-30 bg-white border-b border-[var(--border)] lg:hidden">
         <div className="px-4 space-y-2 py-2.5">
-          <MenuSearchBar value={searchQuery} onChange={setSearchQuery} />
-          <FulfillmentSwitch value={orderType} onChange={setOrderType} />
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <MenuSearchBar value={searchQuery} onChange={setSearchQuery} />
+            </div>
+            <DeliveryModePill />
+          </div>
           {filteredCategories.length > 0 && (
             <CategoryCarousel
               categories={filteredCategories.map((c) => ({ id: c.id, name: c.name }))}
@@ -265,9 +268,6 @@ export function MenuClient({ categories }: { categories: MenuCategory[] }) {
           </aside>
         </div>
       </div>
-
-      {/* ═══ FLOATING CART BAR (mobile) ═══ */}
-      <FloatingCartBar />
 
       {/* ═══ MODAL ═══ */}
       {modalProduct && (

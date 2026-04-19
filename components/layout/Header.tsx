@@ -2,9 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShoppingCart, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useCart } from '@/hooks/use-cart'
 import { useState, useEffect } from 'react'
 
 const navLinks = [
@@ -17,7 +16,6 @@ const navLinks = [
 
 export function Header() {
   const pathname = usePathname()
-  const { itemCount } = useCart()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -66,32 +64,18 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Right side */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <Link
-              href="/cart"
-              className="relative flex items-center gap-2 h-10 px-4 text-sm font-semibold rounded-xl bg-[var(--text-primary)] text-white hover:bg-[#333] transition-colors"
-            >
-              <ShoppingCart className="w-4 h-4" />
-              <span className="hidden sm:inline">Warenkorb</span>
-              {itemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-[var(--accent)] text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 ring-2 ring-white animate-badge-pop">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-50 transition-colors"
-              aria-label="Menü"
-            >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
+          {/* Mobile hamburger only */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-50 transition-colors"
+            aria-label="Menü"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </header>
 
-      {/* Mobile sheet from right */}
+      {/* Mobile sheet */}
       {mobileOpen && (
         <>
           <div className="fixed inset-0 z-30 bg-black/20" onClick={() => setMobileOpen(false)} />
