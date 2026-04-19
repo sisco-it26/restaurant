@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { Bike, Store } from 'lucide-react'
 
 export function FulfillmentSwitch({
   value,
@@ -27,6 +28,7 @@ export function FulfillmentSwitch({
           value === 'DELIVERY' ? 'text-white' : 'text-[var(--text-secondary)]'
         )}
       >
+        <Bike className="w-4 h-4" strokeWidth={2.5} />
         Lieferung
       </button>
       <button
@@ -36,6 +38,7 @@ export function FulfillmentSwitch({
           value === 'PICKUP' ? 'text-white' : 'text-[var(--text-secondary)]'
         )}
       >
+        <Store className="w-4 h-4" strokeWidth={2.5} />
         Abholung
       </button>
     </div>
