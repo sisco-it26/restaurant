@@ -27,7 +27,7 @@ export function CategoryCarousel({
   return (
     <div
       ref={scrollRef}
-      className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-4 px-4 py-0.5"
+      className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 py-1"
       role="tablist"
     >
       {categories.map((cat) => {
@@ -40,10 +40,10 @@ export function CategoryCarousel({
             aria-selected={isActive}
             onClick={() => onSelect(cat.id)}
             className={cn(
-              'flex-shrink-0 px-3.5 py-[6px] rounded-full text-[13px] font-semibold whitespace-nowrap transition-all duration-150',
+              'flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold whitespace-nowrap transition-all duration-200',
               isActive
-                ? 'bg-[var(--text-primary)] text-white'
-                : 'bg-transparent text-[var(--text-secondary)] active:bg-[#E8E6E1]'
+                ? 'bg-[var(--text-primary)] text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
+                : 'bg-white text-[var(--text-secondary)] border border-[var(--border)] active:bg-[#F5F4F0]'
             )}
           >
             {cat.name}
